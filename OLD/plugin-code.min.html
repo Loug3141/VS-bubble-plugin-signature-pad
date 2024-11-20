@@ -1,0 +1,28 @@
+<script id="signature-pad-lite-header-scripts">var signaturePadInstances = 0;
+  window.signaturePads = {};
+
+  function dataURLToBlob(dataURL) {
+    const parts = dataURL.split(";base64,");
+    const contentType = parts[0].split(":")[1];
+    const raw = window.atob(parts[1]);
+    const rawLength = raw.length;
+    const uInt8Array = new Uint8Array(rawLength);
+
+    for (let i = 0; i < rawLength; ++i) {
+      uInt8Array[i] = raw.charCodeAt(i);
+    }
+
+    return new Blob([uInt8Array], { type: contentType });
+  }
+
+  function dataURLGen(instanceObject) {
+    if (instanceObject.isEmpty()) {
+      alert("Please provide a signature first.");
+    } else {
+      const dataURL = instanceObject.toDataURL("image/svg+xml");
+      const blob = dataURLToBlob(dataURL);
+      const url = window.URL.createObjectURL(blob);
+
+      return url;
+    }
+  }</script>
