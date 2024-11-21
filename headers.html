@@ -2,9 +2,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
 <script id="signature-pad-lite-header-scripts">
   var signaturePadInstances = 0;
-  window.signaturePads = {};
+  window.signaturePads = [];
+  window.signaturePadFunctions = {};
 
-  function dataURLToBlob(dataURL) {
+  window.signaturePadFunctions.dataUrlToBlob = (dataURL) => {
     const parts = dataURL.split(";base64,");
     const contentType = parts[0].split(":")[1];
     const raw = window.atob(parts[1]);
@@ -16,20 +17,21 @@
     }
 
     return new Blob([uInt8Array], { type: contentType });
-  }
+  };
 
-  function dataURLGen(ID, type = null) {
-    if (window.signaturePads["signaturePad" + ID].isEmpty()) {
+  window.signaturePadFunctions.dataURLGen = (ID, type = null) => {
+    if (window.signaturePads[ID].isEmpty()) {
       alert("Please provide a signature first.");
+      return null;
     } else {
-      const dataURL = window.signaturePads["signaturePad" + ID].toDataURL(type);
+      const dataURL = window.signaturePads[ID].toDataURL(type);
 
       return dataURL;
     }
-  }
+  };
 
-  function download(dataURL, filename) {
-    const blob = dataURLToBlob(dataURL);
+  window.signaturePadFunctions.download = (dataURL, filename) => {
+    const blob = window.signaturePadFunctions.dataUrlToBlob(dataURL);
     const url = window.URL.createObjectURL(blob);
 
     const a = document.createElement("a");
@@ -41,28 +43,32 @@
     a.click();
 
     window.URL.revokeObjectURL(url);
-  }
-
-  function resizeCanvas(id) {
-    const a = Math.max(window.devicePixelRatio || 1, 1);
-    const canvas = document.querySelector(`#sign-pad-save-to-bubble-${index} canvas`);
-    (canvas.width = canvas.offsetWidth * a), (canvas.height = canvas.offsetHeight * a), canvas.getContext("2d").scale(a, a), window.signaturePads[`signaturePad${id}`].fromData(window.signaturePads[`signaturePad${id}`].toData());
-  }
-
-  window.onresize = () => {
-    for (let index = 0; index < window.signaturePadInstances; index++) {
-      resizeCanvas(index);
-    };
   };
 
-  function saveimg(idSelector, filename) {
+  window.signaturePadFunctions.resizeCanvas = (id) => {
+    const a = Math.max(window.devicePixelRatio || 1, 1);
+    const canvas = document.querySelector(`#signature-pad-${id} canvas`);
+    const signaturePad = window.signaturePads[id];
+    if (!canvas || !signaturePad) {
+      return;
+    }
+    (canvas.width = canvas.offsetWidth * a), (canvas.height = canvas.offsetHeight * a), canvas.getContext("2d").scale(a, a), window.signaturePads[id].fromData(window.signaturePads[id].toData());
+  };
+
+  window.signaturePadFunctions.saveimg = (idSelector, filename) => {
     html2canvas(document.getElementById(idSelector)).then(function (canvas) {
       var link = document.createElement("a");
       link.download = filename;
       link.href = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
       link.click();
     });
-  }
+  };
+
+  window.onresize = () => {
+    for (let index = 0; index < window.signaturePadInstances; index++) {
+      window.signaturePadFunctions.resizeCanvas(index);
+    }
+  };
 </script>
 <style id="signature-pad-lite-header-styles">
   .signature-pad,
@@ -94,31 +100,5 @@
     text-align: center;
     font-size: 1.2em;
     margin-top: 8px;
-  }
-
-  .signature-pad--actions {
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-box-pack: justify;
-    -ms-flex-pack: justify;
-    justify-content: space-between;
-    margin-top: 8px;
-  }
-
-  .signature-pad--actions .column {
-    padding: 0.1em;
-  }
-
-  .signature-pad--actions .button {
-    margin: 0.2em;
-  }
-
-  @media (max-width: 480px) {
-    .signature-pad--actions .button {
-      display: block;
-      width: 100%;
-      min-height: 2em;
-    }
   }
 </style>

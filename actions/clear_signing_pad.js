@@ -1,6 +1,6 @@
 function ac(instance, properties, context) {
-
-	$(`#sign-pad-clear-${instance.data.id}`).click();
+    
+    instance.data.signaturePad.clear();
     
     //reset strokeColor
     instance.data.signaturePad.penColor = instance.data.strokeColor;

@@ -1,8 +1,7 @@
 function ac(instance, properties, context) {
-    
-	let image = dataURLGen(instance.data.id, "image/svg+xml");
+	let image = window.signaturePadFunctions.dataURLGen(instance.data.id, "image/svg+xml");
+    if(!image) return;
     context.uploadContent("signaturePad-"+Date.now()+".svg", image.split('base64,')[1], (err,url) => {
-
         if(err !== null) {
             alert("Error: "+ err);
             console.log(err);
@@ -10,7 +9,5 @@ function ac(instance, properties, context) {
             instance.publishState('signature_image', url);
             instance.triggerEvent('signature_saved');
         }
-
     }, properties.attach_to)
-
 }

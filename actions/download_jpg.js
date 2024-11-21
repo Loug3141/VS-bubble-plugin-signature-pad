@@ -1,7 +1,8 @@
 function ac(instance, properties, context) {
-
-
-    $(`#sign-pad-download-jpg-${instance.data.id}`).click();
-  
-  
-  }
+  if (instance.data.signaturePad.isEmpty()) {
+    alert("Please provide a signature first.");
+  } else {
+    const a = instance.data.signaturePad.toDataURL("image/jpeg");
+    window.signaturePadFunctions.download(a, "signature.jpg");
+  }  
+}
